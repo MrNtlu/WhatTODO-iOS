@@ -143,6 +143,7 @@ class ViewController: UITableViewController {
 }
 extension ViewController: UISearchBarDelegate{
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        loadCategory()
         categories=categories.filter("category CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "category", ascending: true)
         tableView.reloadData()
     }

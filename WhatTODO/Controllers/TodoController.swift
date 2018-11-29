@@ -17,6 +17,7 @@ class TodoController: UIViewController{
     
     @IBOutlet weak var tableView: UITableView!
     
+    var tempTodoItems: Results<TodoItems>?
     var todoItems: Results<TodoItems>?
     var colorID:String?
     var defaultColor:String="34495E"
@@ -31,6 +32,7 @@ class TodoController: UIViewController{
     var selectedCategory : Category?{
         didSet{
             todoItems=selectedCategory?.items.sorted(byKeyPath: "todo", ascending: true)
+            tempTodoItems=todoItems
         }
     }
     
@@ -119,6 +121,8 @@ extension TodoController: UITableViewDelegate,UITableViewDataSource{
         cell.categoryLabel.textColor=UIColor.white
         if todoItems![indexPath.row].checked {
             cell.accessoryType = .checkmark
+        }else{
+            cell.accessoryType = .none
         }
         return cell
     }
@@ -143,23 +147,29 @@ extension TodoController: UITableViewDelegate,UITableViewDataSource{
     func deleteAction(at:IndexPath)->UIContextualAction{
         let todoItem=todoItems![at.row]
         let action=UIContextualAction(style: .destructive, title: "Delete") { (action, view, complation) in
-            var catCont=CategoryController()
-            catCont.deleteObject(object: todoItem)
-            self.tableView.reloadData()
+            if todoItem.checked{
+                let catCont=CategoryController()
+                catCont.deleteObject(object: todoItem)
+                self.tableView.reloadData()
+            }else{
+                self.view.makeToast("Check to delete.")
+            }
         }
         action.backgroundColor=UIColor.red
         return action
     }
 }
 extension TodoController: UISearchBarDelegate{
+    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        todoItems=todoItems!.filter("todo CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "category", ascending: true)
+        todoItems=tempTodoItems
+        todoItems=todoItems!.filter("todo CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "todo", ascending: true)
         tableView.reloadData()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText.count == 0 {
-            todoItems!.sorted(byKeyPath: "todo", ascending: true)
+            todoItems=tempTodoItems
             tableView.reloadData()
             DispatchQueue.main.async {
                 searchBar.resignFirstResponder()
