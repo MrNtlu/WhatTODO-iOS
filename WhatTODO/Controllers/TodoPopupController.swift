@@ -12,10 +12,26 @@ import Toast_Swift
 class TodoPopupController: UIViewController{
     
     @IBOutlet weak var whatTodoText: UITextField!
+    @IBOutlet weak var addButtonOutlet: UIButton!
+    @IBOutlet weak var popupView: UIView!
     
     var tableView: UITableView?
     var realm: Realm?
     var category: Category?
+    var todoItem:TodoItems?
+    var colorID:String?
+    
+    var mTodo:TodoItems?{
+        didSet{
+            todoItem=mTodo
+        }
+    }
+    
+    var mColorID:String?{
+        didSet{
+            colorID=mColorID
+        }
+    }
     
     var mCategory:Category?{
         didSet{
@@ -35,6 +51,13 @@ class TodoPopupController: UIViewController{
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if colorID != nil{
+            self.popupView.backgroundColor=UIColor(hexString: colorID!)
+        }
+        if todoItem != nil{
+            addButtonOutlet.setTitle("Update", for: .normal)
+            whatTodoText.text=todoItem?.todo
+        }
     }
     
     @IBAction func cancelAction(_ sender: Any) {
@@ -44,10 +67,15 @@ class TodoPopupController: UIViewController{
     @IBAction func addButtonAction(_ sender: Any) {
         do{
             try self.realm!.write {
-                let newTodo=TodoItems()
-                newTodo.todo=whatTodoText.text!
-                newTodo.checked=false
-                category?.items.append(newTodo)
+                if self.todoItem == nil {
+                    let newTodo=TodoItems()
+                    newTodo.todo=whatTodoText.text!
+                    newTodo.checked=false
+                    category?.items.append(newTodo)
+                }
+                else if self.todoItem != nil{
+                    self.todoItem!.todo=self.whatTodoText.text!
+                }
                 tableView?.reloadData()
             }
         }catch{

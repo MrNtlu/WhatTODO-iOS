@@ -44,15 +44,6 @@ class TodoController: UIViewController{
         tableView.register(UINib(nibName: "CategoryCell", bundle: nil), forCellReuseIdentifier: "categoryCell")
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier=="openTodoPopUp"{
-            let destinationVC=segue.destination as! TodoPopupController
-            destinationVC.mRealm=self.realm
-            destinationVC.mCategory=self.selectedCategory
-            destinationVC.mTableView=self.tableView
-        }
-    }
-    
     override func viewDidAppear(_ animated: Bool) {
         title=selectedCategory?.category
         TodoController.updateNavBar(withHexCode: colorID!,navBar: navigationController!)
@@ -78,9 +69,42 @@ class TodoController: UIViewController{
         navBar.tintColor=ContrastColorOf(navBarColor!, returnFlat: true)
         navBar.barTintColor=navBarColor
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destinationVC=segue.destination as! TodoPopupController
+        destinationVC.mRealm=self.realm
+        destinationVC.mCategory=self.selectedCategory
+        destinationVC.mTableView=self.tableView
+        destinationVC.mColorID=self.colorID
+        if segue.identifier=="goTodoEdit"{
+            destinationVC.mTodo=self.todoItems![self.indexPathForEdit!]
+        }
+    }
+    
+    func updateCheck(indexPath: IndexPath){
+        do{
+            try realm.write {
+                todoItems![indexPath.row].checked = !todoItems![indexPath.row].checked
+            }
+        }catch{
+            print("Error \(error)")
+        }
+    }
 }
 extension TodoController: UITableViewDelegate,UITableViewDataSource{
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //let cell=tableView.dequeueReusableCell(withIdentifier: "categoryCell", for: indexPath) as! CategoryCell
+        if todoItems![indexPath.row].checked {
+            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+        }
+        else if !(todoItems![indexPath.row].checked){
+//            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: todoItems![indexPath.row].todo)
+//            attributeString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 2, range: NSMakeRange(0, attributeString.length))
+
+            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        }
+        updateCheck(indexPath: indexPath)
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -93,6 +117,9 @@ extension TodoController: UITableViewDelegate,UITableViewDataSource{
         cell.categoryLabel.text=todoItems?[indexPath.row].todo
         cell.backgroundColor=UIColor(hexString: colorID!)
         cell.categoryLabel.textColor=UIColor.white
+        if todoItems![indexPath.row].checked {
+            cell.accessoryType = .checkmark
+        }
         return cell
     }
     

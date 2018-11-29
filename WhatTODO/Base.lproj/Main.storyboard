@@ -107,7 +107,7 @@
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="UDC-ga-u1Q">
                             <connections>
                                 <action selector="addButtonPressed:" destination="Zeb-DJ-By5" id="YRp-nE-u67"/>
-                                <segue destination="U0f-RP-iZY" kind="presentation" id="AwQ-S7-QpN"/>
+                                <segue destination="U0f-RP-iZY" kind="presentation" identifier="openTodoPopUp" id="AwQ-S7-QpN"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -189,6 +189,8 @@
                         <viewLayoutGuide key="safeArea" id="WpF-yW-ieW"/>
                     </view>
                     <connections>
+                        <outlet property="addButtonOutlet" destination="M7t-bz-GSD" id="SQv-uZ-TuA"/>
+                        <outlet property="popupView" destination="fTO-1I-xFk" id="nLJ-6q-jpR"/>
                         <outlet property="whatTodoText" destination="OZp-cS-Joj" id="1kl-ph-u0J"/>
                     </connections>
                 </viewController>
@@ -315,6 +317,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="7xq-B8-Hmn"/>
-        <segue reference="AwQ-S7-QpN"/>
+        <segue reference="wE6-sI-Hqp"/>
     </inferredMetricsTieBreakers>
 </document>
